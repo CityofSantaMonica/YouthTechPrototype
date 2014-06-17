@@ -20,7 +20,7 @@ function initializeMap(mapTarget, position) {
 
     var mapOptions = {
         center: currentLocation,
-        zoom: 13
+        zoom: 15
     };
 
     var map = new google.maps.Map(mapTarget, mapOptions);
