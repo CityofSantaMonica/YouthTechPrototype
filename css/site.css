@@ -1,0 +1,21 @@
+html {
+    height: 100%
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#mapCanvas {
+    height: 100%;
+}
+
+#stopsList {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+    border: solid 1px blue;
+    background-color: #efefef;
+}

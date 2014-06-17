@@ -1,82 +1,59 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Youth Tech Prototype</title>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <style type="text/css">
-      html { height: 100% }
-      body { height: 100%; margin: 0; padding: 0;}
-      #map-canvas { height: 100% }
-      #stops-list { position: absolute; bottom: 1em; right: 1em; border: solid 1px red; background-color: #efefef; }
-    </style>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js"></script>
-    <script type="text/javascript">
-	
-		function stopsViewModel(stopsData) {
-			this.stops = ko.observableArray(stopsData);
-		}
-	
-        function compareDistance(a,b){
-            if(a.distance < b.distance)
-                return -1;
-            if(a.distance > b.distance)
-                return 1;
-            return 0;
-        }
-		
-        function showPosition(position){
-            var currentLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-			
-            var mapOptions = {
-                center: currentLocation,
-                zoom: 13
-			};
-			
-            var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-			
-            var marker = new google.maps.Marker({position: currentLocation, map: map});
-			
-            $.getJSON("./data/busstops.geojson", function(busstops) {
-			
-                for(var index = 0; index < busstops.features.length; index++){
-                    var feature = busstops.features[index];
-                    feature.LatLng = new google.maps.LatLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-                    feature.distance = google.maps.geometry.spherical.computeDistanceBetween(currentLocation, feature.LatLng);
-                }
-				
-                busstops.features.sort(compareDistance);
-				
-				var koData = [];
-				
-                for(var index = 0; index < busstops.features.length && index < 5; index++){
-                    var feature = busstops.features[index];
-                    new google.maps.Marker({position: feature.LatLng, map: map, title: "distance = " + feature.distance + " feet"});
-					koData.push(feature);
-                }
-				
-				ko.applyBindings(new stopsViewModel(koData), document.getElementById("stops-list"));
-            });   
-        }
-		
-        function initialize(){
-            var currentPosition = navigator.geolocation.getCurrentPosition(showPosition);
-        }
-		
-        google.maps.event.addDomListener(window, 'load', initialize);
-    </script>
+    <head>
+        <title>Youth Tech Prototype</title>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+        <link href="css/site.css" type="text/css" rel="stylesheet" />
     </head>
     <body>
-        <div id="map-canvas"></div>
-		
-		<div id="stops-list">
-			<ul data-bind="foreach: stops">
-			    <li>
-					<h3 data-bind="text: properties.stop_name"></h3>
-					<p data-bind="text: properties.stop_desc"></p>
-				</li>
-			</ul>
-		</div>
+        <div id="mapCanvas"></div>
+
+        <div id="stopsList" data-bind="visible: hasStops">
+            <ol data-bind="foreach: stops">
+                <li>
+                    <h3 data-bind="text: properties.stop_name"></h3>
+                    <p data-bind="text: properties.stop_desc"></p>
+                    <p data-bind="text: title"></p>
+                </li>
+            </ol>
+            <p>Average distance: <span data-bind="text: averageDistance"></span> feet</p>
+        </div>
+
+        <script src="https://maps.googleapis.com/maps/api/js?libraries=geometry" type="text/javascript"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" type="text/javascript"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js" type="text/javascript"></script>
+        <script src="js/mapping.js" type="text/javascript"></script>
+        <script src="js/databinding.js" type="text/javascript"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                var listTarget = document.getElementById("stopsList");
+                var mapTarget = document.getElementById("mapCanvas");
+
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var map = initializeMap(mapTarget, position);
+                    var mapCenter = map.getCenter();
+
+                    $.getJSON("data/busstops.geojson", function (stopsJSON) {
+                        var stopsWithDistance = computeDistance(stopsJSON, mapCenter);
+                        stopsWithDistance.features.sort(compareDistance);
+
+                        var stopListViewModel = new stopsViewModel();
+
+                        for (var index = 0; index < 5; index++) {
+                            var feature = stopsWithDistance.features[index];
+                            feature.title = "distance = " + feature.distance + " feet";
+
+                            addMarker(map, feature.LatLng, feature.title);
+
+                            stopListViewModel.addStop(feature);
+                        }
+
+                        ko.applyBindings(stopListViewModel, listTarget);
+                    });
+                });
+            });
+        </script>
+
     </body>
 </html>
