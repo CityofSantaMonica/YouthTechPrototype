@@ -6,8 +6,10 @@
         <link href="css/site.css" type="text/css" rel="stylesheet" />
     </head>
     <body>
+        <!-- map will be drawn in this div -->
         <div id="mapCanvas"></div>
 
+        <!-- this div defines a template to build the list of stops -->
         <div id="stopsList" data-bind="visible: hasStops">
             <ol data-bind="foreach: stops">
                 <li>
@@ -26,34 +28,45 @@
         <script src="js/databinding.js" type="text/javascript"></script>
 
         <script type="text/javascript">
+            //this code runs when the page has fully loaded
             $(document).ready(function() {
+                //save references to the target divs
                 var listTarget = document.getElementById("stopsList");
                 var mapTarget = document.getElementById("mapCanvas");
 
+                //request the users's current position
                 navigator.geolocation.getCurrentPosition(function (position) {
+                    //create a map object centered at the given position
                     var map = initializeMap(mapTarget, position);
+                    //save a reference to the center of the map
                     var mapCenter = map.getCenter();
 
+                    //load the bus stop data
                     $.getJSON("data/busstops.geojson", function (stopsJSON) {
+                        //compute distances to each bus stop
                         var stopsWithDistance = computeDistance(stopsJSON, mapCenter);
+                        //sort based on distance (closest first)
                         stopsWithDistance.features.sort(compareDistance);
 
+                        //create a new object for binding the list data
                         var stopListViewModel = new stopsViewModel();
 
+                        //take the first 5 stops
                         for (var index = 0; index < 5; index++) {
+                            //save a reference to the current feature (stop)
                             var feature = stopsWithDistance.features[index];
+                            //give this stop a title attribute with it's distance
                             feature.title = "distance = " + feature.distance + " feet";
-
+                            //add a marker on the map for this stop
                             addMarker(map, feature.LatLng, feature.title);
-
+                            //add this stop to the list for databinding
                             stopListViewModel.addStop(feature);
                         }
-
+                        //apply the databinding to the list div
                         ko.applyBindings(stopListViewModel, listTarget);
                     });
                 });
             });
         </script>
-
     </body>
 </html>
