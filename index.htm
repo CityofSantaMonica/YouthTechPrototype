@@ -34,7 +34,7 @@
                 var listTarget = document.getElementById("stopsList");
                 var mapTarget = document.getElementById("mapCanvas");
 
-                //request the users's current position
+                //request the users's current position, execute the callback when obtained
                 navigator.geolocation.getCurrentPosition(function (position) {
                     //create a map object centered at the given position
                     var map = initializeMap(mapTarget, position);
