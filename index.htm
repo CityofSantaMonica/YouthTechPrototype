@@ -21,7 +21,7 @@
             <p>Average distance: <span data-bind="text: averageDistance"></span> feet</p>
         </div>
 
-        <script src="https://maps.googleapis.com/maps/api/js?libraries=geometry" type="text/javascript"></script>
+        <script src="//maps.googleapis.com/maps/api/js?libraries=geometry" type="text/javascript"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" type="text/javascript"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js" type="text/javascript"></script>
         <script src="js/mapping.js" type="text/javascript"></script>
@@ -40,7 +40,7 @@
                     var map = initializeMap(mapTarget, position);
                     //save a reference to the center of the map
                     var mapCenter = map.getCenter();
-
+                    
                     //load the bus stop data
                     $.getJSON("data/busstops.geojson", function (stopsJSON) {
                         //compute distances to each bus stop
@@ -64,6 +64,11 @@
                         }
                         //apply the databinding to the list div
                         ko.applyBindings(stopListViewModel, listTarget);
+                    });
+                    
+                    //load hills polygons
+                    $.getJSON("data/plants.geojson", function (plantsJSON) {
+                        map.data.addGeoJson(plantsJSON);
                     });
                 });
             });
