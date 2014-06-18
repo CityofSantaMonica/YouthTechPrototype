@@ -68,8 +68,17 @@
                     
                     //load hills polygons
                     $.getJSON("data/plants.geojson", function (plantsJSON) {
+                        var point = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                         map.data.addGeoJson(plantsJSON);
-                        // use google.maps.geometry.poly.containsLocation to match current location
+                        map.data.setStyle({visible: false});
+                        map.data.forEach(function (feature) {
+                            if(feature.k instanceof google.maps.Data.Polygon){
+                                var polygon = new google.maps.Polygon({paths: feature.k.getAt(0).getArray()});
+                                if(google.maps.geometry.poly.containsLocation(point, polygon)===true){
+                                    alert(feature.j.Area);
+                                }
+                            }
+                        });
                     });
                 });
             });
