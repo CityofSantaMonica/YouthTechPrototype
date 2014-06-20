@@ -29,6 +29,7 @@
 
         <script type="text/javascript">
             //this code runs when the page has fully loaded
+            var infoWindow = new google.maps.InfoWindow();
             $(document).ready(function() {
                 //save references to the target divs
                 var listTarget = document.getElementById("stopsList");
@@ -50,7 +51,7 @@
 
                         //create a new object for binding the list data
                         var stopListViewModel = new stopsViewModel();
-
+                        
                         //take the first 5 stops
                         for (var index = 0; index < 5; index++) {
                             //save a reference to the current feature (stop)
@@ -58,7 +59,13 @@
                             //give this stop a title attribute with it's distance
                             feature.title = "distance = " + feature.distance + " feet";
                             //add a marker on the map for this stop
-                            addMarker(map, feature.LatLng, feature.title);
+                            var marker = addMarker(map, feature.LatLng, feature.title);
+                            marker.content = feature.title;
+                            google.maps.event.addListener(marker, 'click', (function(){
+                                infoWindow.setContent(this.content);
+                                infoWindow.setPosition(this.position);
+                                infoWindow.open(map);
+                            }));
                             //add this stop to the list for databinding
                             stopListViewModel.addStop(feature);
                         }

@@ -59,5 +59,5 @@ function addMarker(map, position, options) {
     var markerOptions = $.extend(options, defaultOptions);
 
     //add a new marker with the options
-    new google.maps.Marker(markerOptions);
+    return new google.maps.Marker(markerOptions);
 }
