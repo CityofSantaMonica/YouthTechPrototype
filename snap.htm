@@ -1,0 +1,45 @@
+<html>
+
+<head>
+    <title>Snap SVG Test</title>
+    <script src="js/snap.svg-min.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <h1>Snap SVG Test</h1>
+</body>
+<script type="text/javascript">
+    var s = Snap(320, 320);
+    var redDegree = 0;
+    var greenDegree = 0;
+    var blueDegree = 0;
+    var pivotX = 160;
+    var pivotY = 160;
+    Snap.load("snap.svg", function (f) {
+        var redCircle = f.select("#redCircle");
+        s.append(redCircle);
+        var greenCircle = f.select("#greenCircle");
+        s.append(greenCircle);
+        var blueCircle = f.select("#blueCircle");
+        s.append(blueCircle);
+    });
+    setInterval(function () {
+        redDegree += 2;
+        greenDegree += 4;
+        blueDegree += 6;
+        var redCircle = s.select("#redCircle");
+        var greenCircle = s.select("#greenCircle");
+        var blueCircle = s.select("#blueCircle");
+        redCircle.attr({
+            transform: "r" + [redDegree, pivotX, pivotY]
+        });
+        greenCircle.attr({
+            transform: "r" + [greenDegree, pivotX, pivotY]
+        });
+        blueCircle.attr({
+            transform: "r" + [blueDegree, pivotX, pivotY]
+        });
+    }, 100);
+</script>
+
+</html>
