@@ -30,6 +30,7 @@
         var redCircle = s.select("#redCircle");
         var greenCircle = s.select("#greenCircle");
         var blueCircle = s.select("#blueCircle");
+        /*
         redCircle.attr({
             transform: "r" + [redDegree, pivotX, pivotY]
         });
@@ -39,6 +40,16 @@
         blueCircle.attr({
             transform: "r" + [blueDegree, pivotX, pivotY]
         });
+        */
+        redCircle.animate({
+            transform: "r" + [redDegree, pivotX, pivotY]
+        }, 100, mina.linear);
+        greenCircle.animate({
+            transform: "r" + [greenDegree, pivotX, pivotY]
+        }, 100, mina.linear);
+        blueCircle.animate({
+            transform: "r" + [blueDegree, pivotX, pivotY]
+        }, 100, mina.linear);
     }, 100);
 </script>
 
